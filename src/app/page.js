@@ -18,7 +18,7 @@ export default function Home() {
             <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition">
               <h2 className="text-xl font-semibold mb-4">See Cached URLs</h2>
               <p>View all the URLs cached in the system.</p>
-              <Link href="/cache" className="mt-4 inline-block text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
+              <Link href="/see-cached" className="mt-4 inline-block text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
                 Go to Cache
               </Link>
             </div>

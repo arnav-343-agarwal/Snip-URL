@@ -43,3 +43,18 @@ export const getOrAddToCache = async (shortUrl, fullUrl) => {
 
   return fullUrl;
 };
+
+// New function to get all cached shortUrls
+export const getAllCachedUrls = async () => {
+  const cachedShortUrls = await redis.lrange('lru:cache', 0, CACHE_SIZE_LIMIT - 1);
+
+  // Fetch all URLs for the cached shortUrls
+  const cachedUrls = await Promise.all(
+    cachedShortUrls.map(async (shortUrl) => {
+      const fullUrl = await redis.get(shortUrl);
+      return { shortUrl, fullUrl }; // Return shortUrl and its corresponding fullUrl
+    })
+  );
+
+  return cachedUrls;
+};
