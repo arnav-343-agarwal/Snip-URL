@@ -1,4 +1,5 @@
 import { Url } from "@/lib/models/Url";
+import { dbConnect } from "@/lib/dbConnect";
 import { nanoid } from "nanoid";
 import { getOrAddToCache } from "@/lib/lruCache";  // Import the cache functions
 
@@ -13,6 +14,7 @@ export async function POST(req) {
     }
 
     // Check if this URL already exists in the database
+    await dbConnect();
     const existingUrl = await Url.findOne({ fullUrl });
     if (existingUrl) {
       // If it's already in the database, inform the user and return the short URL
