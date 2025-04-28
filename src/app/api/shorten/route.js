@@ -1,26 +1,9 @@
-import { urlModel } from "../../../models/urlModel"; // Import your model
-import { nanoid } from "nanoid"; // Import nanoid to generate short URL
-import { cookies } from "next/headers"; // To access cookies for JWT validation
-import { jwtVerify } from "jose"; // To verify JWT (you can also use jsonwebtoken)
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { Url } from "@/lib/models/Url";
+import { nanoid } from "nanoid";
+import { getOrAddToCache } from "@/lib/lruCache";  // Import the cache functions
 
 export async function POST(req) {
-  const token = cookies().get("token"); // Get token from cookies
-
-  if (!token) {
-    return new Response(JSON.stringify({ message: "Unauthorized, please login first." }), { status: 401 });
-  }
-
   try {
-    // Verify JWT
-    const verified = await jwtVerify(token, JWT_SECRET);
-
-    if (!verified) {
-      return new Response(JSON.stringify({ message: "Invalid token!" }), { status: 401 });
-    }
-
-    // Proceed to shorten the URL
     const { fullUrl } = await req.json();
 
     // Validate the URL format
@@ -29,23 +12,27 @@ export async function POST(req) {
       return new Response(JSON.stringify({ message: "Invalid URL format." }), { status: 400 });
     }
 
-    // Check if this URL is already shortened
-    const existingUrl = await urlModel.findOne({ fullUrl });
+    // Check if this URL already exists in the database
+    const existingUrl = await Url.findOne({ fullUrl });
     if (existingUrl) {
+      // If it's already in the database, inform the user and return the short URL
+      await getOrAddToCache(existingUrl.shortUrl, fullUrl);  // Update cache with most recent
       return new Response(JSON.stringify({ message: "URL already shortened.", shortUrl: existingUrl.shortUrl }), { status: 200 });
     }
 
-    // Create a new short URL
-    const shortUrl = nanoid(10); // You can change the length if needed
+    // Generate a new short URL if it's not found in the database
+    const shortUrl = nanoid(10);  // Generate a new short URL
 
     // Save the shortened URL to the database
-    const newUrl = new urlModel({
+    const newUrl = new Url({
       fullUrl,
       shortUrl,
     });
 
-    await newUrl.save();
-    await addToCache(shortUrl, fullUrl);
+    await newUrl.save();  // Save to DB
+
+    // Add the shortened URL to the cache
+    await getOrAddToCache(shortUrl, fullUrl);
 
     // Send back the response with the shortened URL
     return new Response(JSON.stringify({ fullUrl, shortUrl: newUrl.shortUrl }), { status: 201 });

@@ -1,34 +1,31 @@
-import { getFromCache, addToCache } from '@/lib/lruCache';
-import { connectToDB } from '@/lib/mongodb'; 
-import UrlModel from '@/models/url';
+import { getOrAddToCache } from "@/lib/lruCache";  // Import cache functions
+import { Url } from "@/lib/models/Url";  // Import the URL model
 
-export async function GET(request, { params }) {
-  const { shortId } = params;
-
+export async function GET(req,{params}) {
   try {
-    // 1. Try to get full URL from Redis LRU cache
-    const cachedFullUrl = await getFromCache(shortId);
+    // Access the shortId directly from req.params
+    const { shortId } = params;  // Destructure shortId from route params
 
-    if (cachedFullUrl) {
-      return Response.redirect(cachedFullUrl, 302);
+    // Try to get the full URL from the cache first
+    const fullUrlFromCache = await getOrAddToCache(shortId, null);
+
+    if (!fullUrlFromCache) {
+      // If it's not in the cache, check the database
+      const urlFromDb = await Url.findOne({ shortUrl: shortId });
+
+      if (!urlFromDb) {
+        return new Response(JSON.stringify({ message: "Short URL not found!" }), { status: 404 });
+      }
+
+      // If found in the DB, add it to the cache
+      await getOrAddToCache(shortId, urlFromDb.fullUrl);
+      return new Response(JSON.stringify({ fullUrl: urlFromDb.fullUrl }), { status: 200 });
     }
 
-    // 2. If not found in cache, query MongoDB
-    await connectToDB();
-    const urlEntry = await UrlModel.findOne({ shortId });
-
-    if (!urlEntry) {
-      return new Response(JSON.stringify({ error: 'Short URL not found' }), { status: 404 });
-    }
-
-    // 3. Save it in Redis LRU cache for next time
-    await addToCache(shortId, urlEntry.fullUrl);
-
-    // 4. Redirect to full URL
-    return Response.redirect(urlEntry.fullUrl, 302);
-
+    // If found in cache, return it
+    return new Response(JSON.stringify({ fullUrl: fullUrlFromCache }), { status: 200 });
   } catch (error) {
-    console.error('Error in short URL GET:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    console.error(error);
+    return new Response(JSON.stringify({ message: "Something went wrong!" }), { status: 500 });
   }
 }
