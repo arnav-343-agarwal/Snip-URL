@@ -45,6 +45,7 @@ export async function POST(req) {
     });
 
     await newUrl.save();
+    await addToCache(shortUrl, fullUrl);
 
     // Send back the response with the shortened URL
     return new Response(JSON.stringify({ fullUrl, shortUrl: newUrl.shortUrl }), { status: 201 });
