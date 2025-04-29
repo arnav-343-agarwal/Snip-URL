@@ -2,8 +2,9 @@ import { getOrAddToCache } from "@/lib/lruCache";
 import { Url } from "@/lib/models/Url";
 import { dbConnect } from "@/lib/dbConnect";
 
-export async function GET(req, context) {
+export async function GET(req, contextPromise) {
   try {
+    const context = await contextPromise;
     const { shortId } = context.params;
 
     await dbConnect();
