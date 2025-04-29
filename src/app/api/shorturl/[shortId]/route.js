@@ -4,8 +4,7 @@ import { dbConnect } from "@/lib/dbConnect";
 
 export async function GET(req, context) {
   try {
-    const { params } = await context;
-    const { shortId } = params;
+    const { shortId } = context.params;
 
     await dbConnect();
 
