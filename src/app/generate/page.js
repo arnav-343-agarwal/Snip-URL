@@ -9,10 +9,13 @@ export default function Generate() {
   const [loading, setLoading] = useState(false);
   const [timeTaken, setTimeTaken] = useState(null);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
 
   const handleGenerateShortUrl = async () => {
     setLoading(true);
     setError('');
+    setInfo('');
+    setShortUrl('');
     const startTime = performance.now();
 
     try {
@@ -28,6 +31,14 @@ export default function Generate() {
 
       if (response.ok) {
         setShortUrl(data.shortUrl);
+
+        if (data.newlyCreated) {
+          setInfo('✨ A new short URL has been created.');
+        } else if (data.fromCache) {
+          setInfo('✅ Short URL retrieved from Redis cache.');
+        } else {
+          setInfo('ℹ️ Short URL retrieved from the database.');
+        }
       } else {
         setError(data.message || 'Something went wrong!');
       }
@@ -63,15 +74,28 @@ export default function Generate() {
               {loading ? 'Generating...' : 'Generate Short URL'}
             </button>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {error && (
+              <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
+
+            {info && (
+              <div className="mt-4 p-3 bg-blue-100 border border-blue-400 text-blue-800 rounded">
+                {info}
+              </div>
+            )}
 
             {shortUrl && (
               <div className="mt-6">
                 <p className="font-semibold">Short URL:</p>
-                <a href={`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`} className="text-blue-500">
+                <a
+                  href={`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
+                  className="text-blue-500 break-all"
+                >
                   {`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
                 </a>
-                <p className="mt-2">Time taken: {timeTaken} ms</p>
+                <p className="mt-2 text-sm text-gray-600">Time taken: {timeTaken} ms</p>
               </div>
             )}
           </div>
