@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 export default function SeeDatabase() {
   const [urls, setUrls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedRows, setExpandedRows] = useState({});
 
   useEffect(() => {
     const fetchUrls = async () => {
@@ -22,6 +23,17 @@ export default function SeeDatabase() {
 
     fetchUrls();
   }, []);
+
+  const toggleReadMore = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const truncate = (text, length = 50) => {
+    return text.length > length ? text.slice(0, length) + '...' : text;
+  };
 
   return (
     <>
@@ -44,7 +56,7 @@ export default function SeeDatabase() {
                 </thead>
                 <tbody>
                   {urls.map((url) => (
-                    <tr key={url._id} className="border-t">
+                    <tr key={url._id} className="border-t align-top">
                       <td className="p-3 text-blue-600">
                         <a
                           href={`/api/shorturl/${url.shortUrl}`}
@@ -54,7 +66,19 @@ export default function SeeDatabase() {
                           {url.shortUrl}
                         </a>
                       </td>
-                      <td className="p-3 break-words">{url.fullUrl}</td>
+                      <td className="p-3 break-words">
+                        {expandedRows[url._id]
+                          ? url.fullUrl
+                          : truncate(url.fullUrl)}
+                        {url.fullUrl.length > 50 && (
+                          <button
+                            onClick={() => toggleReadMore(url._id)}
+                            className="ml-2 text-sm text-blue-500 underline"
+                          >
+                            {expandedRows[url._id] ? 'show less' : 'read full'}
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
