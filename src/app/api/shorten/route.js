@@ -5,6 +5,7 @@ import { getOrAddToCache } from "@/lib/lruCache";
 
 export async function POST(req) {
   try {
+    const start = Date.now();
     const { fullUrl } = await req.json();
 
     const regex = /^(ftp|http|https):\/\/[^ "]+$/;
@@ -28,6 +29,7 @@ export async function POST(req) {
           shortUrl: existingUrl.shortUrl,
           fromCache: !!cached,
           newlyCreated: false,
+          timeTaken: `${Date.now() - start}ms`
         }),
         { status: 200 }
       );
@@ -44,6 +46,7 @@ export async function POST(req) {
         message: "New short URL created.",
         shortUrl,
         fromCache: false,
+        timeTaken: `${Date.now() - start}ms`,
         newlyCreated: true,
       }),
       { status: 201 }
