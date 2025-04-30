@@ -24,6 +24,7 @@ export default function Generate() {
     setSource('');
     setTimeTaken('');
 
+    const start = Date.now();
     try {
       const response = await fetch('/api/shorten', {
         method: 'POST',
@@ -31,13 +32,14 @@ export default function Generate() {
         body: JSON.stringify({ fullUrl: longUrl }),
       });
 
+      const end = Date.now();
       const data = await response.json();
 
       if (response.ok) {
-        setShortUrl(data.shortUrl);
+        setShortUrl(`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${data.shortUrl}`);
         setInfo(data.message || 'Short URL generated successfully!');
         setSource(data.fromCache ? 'Cache' : 'Database');
-        setTimeTaken(data.timeTaken || '');
+        setTimeTaken(`${end - start} ms`);
       } else {
         setError(data.message || 'An error occurred.');
       }
@@ -48,19 +50,37 @@ export default function Generate() {
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shortUrl);
+  };
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 p-6">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-2xl mx-auto text-center mb-6"
+        >
+          <h1 className="text-3xl font-bold mb-2 text-gray-800">URL Shortener</h1>
+          <p className="text-gray-600 text-sm">
+            Paste a long URL to generate a clean, shareable short link.
+            You'll also see performance details like generation time and source (cache/database).
+          </p>
+        </motion.div>
+
+        {/* Input and result card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          className="max-w-xl mx-auto"
         >
           <Card className="p-6 shadow-xl">
             <CardContent>
-              <h2 className="text-2xl font-bold mb-4 text-center">Generate a Short URL</h2>
+              <h2 className="text-xl font-semibold mb-4 text-center">Generate a Short URL</h2>
               <Input
                 type="text"
                 placeholder="Enter your long URL"
@@ -75,48 +95,58 @@ export default function Generate() {
               >
                 {loading ? 'Generating...' : 'Generate'}
               </Button>
-              {info && <p className="text-green-600 text-sm text-center mb-2">{info}</p>}
-              {error && <p className="text-red-600 text-sm text-center mb-2">{error}</p>}
+              {info && <p className="text-green-600 text-center text-sm mb-2">{info}</p>}
+              {error && <p className="text-red-600 text-center text-sm mb-2">{error}</p>}
               {shortUrl && (
-                <div className="mt-4 text-center">
-                  <p className="text-gray-700">Short URL:</p>
+                <div className="bg-gray-100 p-3 rounded-md flex items-center justify-between">
                   <a
-                    href={`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
-                    className="text-blue-500 underline break-all"
+                    href={shortUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="text-blue-600 underline truncate max-w-[80%]"
                   >
-                    {`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
+                    {shortUrl}
                   </a>
+                  <Button variant="outline" size="sm" onClick={copyToClipboard}>
+                    Copy
+                  </Button>
                 </div>
-              )}
-
-              {(source || timeTaken) && (
-                <>
-                  <p className="text-center mt-6 text-gray-700 text-sm">
-                    Below is the info about how your short URL was generated:
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    {timeTaken && (
-                      <Card className="p-4 text-center shadow-md bg-white">
-                        <p className="text-sm text-gray-500">Time Taken</p>
-                        <p className="text-lg font-semibold">🕒 {timeTaken}</p>
-                      </Card>
-                    )}
-                    {source && (
-                      <Card className="p-4 text-center shadow-md bg-white">
-                        <p className="text-sm text-gray-500">Source</p>
-                        <p className="text-lg font-semibold">
-                          {source === 'Cache' ? '⚡ Cache' : '💾 Database'}
-                        </p>
-                      </Card>
-                    )}
-                  </div>
-                </>
               )}
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Time Taken and Source Cards */}
+        {(timeTaken || source) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 max-w-xl mx-auto">
+            {timeTaken && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Card className="p-4 text-center shadow-md bg-white">
+                  <p className="text-sm text-gray-500">Time Taken</p>
+                  <p className="text-lg font-semibold text-indigo-700">🕒 {timeTaken}</p>
+                </Card>
+              </motion.div>
+            )}
+            {source && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Card className="p-4 text-center shadow-md bg-white">
+                  <p className="text-sm text-gray-500">Source</p>
+                  <p className="text-lg font-semibold text-purple-700">
+                    {source === 'Cache' ? '⚡ Cache' : '💾 Database'}
+                  </p>
+                </Card>
+              </motion.div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
