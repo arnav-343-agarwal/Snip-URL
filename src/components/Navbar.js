@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import { Button } from "./ui/button";
+import { Tooltip } from "./ui/tooltip";
 
 export default function Navbar() {
   return (
@@ -6,15 +7,39 @@ export default function Navbar() {
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">QuickURL</h1>
         <div className="flex space-x-6">
-          <Link href="https://redis.io" className="hover:underline">
-            Redis Site
-          </Link>
-          <Link href="https://upstash.com" className="hover:underline">
-            Upstash Redis
-          </Link>
-          <Link href="https://shadcn.dev" className="hover:underline">
-            Shadcn Docs
-          </Link>
+          <Tooltip content="Redis Official Site" side="bottom">
+            <Button
+              as="a"
+              href="https://redis.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              Redis Site
+            </Button>
+          </Tooltip>
+          <Tooltip content="Upstash Redis" side="bottom">
+            <Button
+              as="a"
+              href="https://upstash.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              Upstash Redis
+            </Button>
+          </Tooltip>
+          <Tooltip content="Shadcn Documentation" side="bottom">
+            <Button
+              as="a"
+              href="https://shadcn.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              Shadcn Docs
+            </Button>
+          </Tooltip>
         </div>
       </div>
     </nav>
