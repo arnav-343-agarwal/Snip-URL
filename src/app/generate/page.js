@@ -13,12 +13,16 @@ export default function Generate() {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState('');
   const [error, setError] = useState('');
+  const [source, setSource] = useState('');
+  const [timeTaken, setTimeTaken] = useState('');
 
   const handleGenerateShortUrl = async () => {
     setLoading(true);
     setError('');
     setInfo('');
     setShortUrl('');
+    setSource('');
+    setTimeTaken('');
 
     try {
       const response = await fetch('/api/shorten', {
@@ -32,6 +36,8 @@ export default function Generate() {
       if (response.ok) {
         setShortUrl(data.shortUrl);
         setInfo(data.message || 'Short URL generated successfully!');
+        setSource(data.fromCache ? 'Cache' : 'Database');
+        setTimeTaken(data.timeTaken || '');
       } else {
         setError(data.message || 'An error occurred.');
       }
@@ -69,18 +75,44 @@ export default function Generate() {
               >
                 {loading ? 'Generating...' : 'Generate'}
               </Button>
-              {info && <p className="text-green-600">{info}</p>}
-              {error && <p className="text-red-600">{error}</p>}
+              {info && <p className="text-green-600 text-sm text-center mb-2">{info}</p>}
+              {error && <p className="text-red-600 text-sm text-center mb-2">{error}</p>}
               {shortUrl && (
-                <div className="mt-4">
+                <div className="mt-4 text-center">
                   <p className="text-gray-700">Short URL:</p>
                   <a
                     href={`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
-                    className="text-blue-500 underline"
+                    className="text-blue-500 underline break-all"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     {`${process.env.NEXT_PUBLIC_DOMAIN_NAME}/api/shorturl/${shortUrl}`}
                   </a>
                 </div>
+              )}
+
+              {(source || timeTaken) && (
+                <>
+                  <p className="text-center mt-6 text-gray-700 text-sm">
+                    Below is the info about how your short URL was generated:
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    {timeTaken && (
+                      <Card className="p-4 text-center shadow-md bg-white">
+                        <p className="text-sm text-gray-500">Time Taken</p>
+                        <p className="text-lg font-semibold">🕒 {timeTaken}</p>
+                      </Card>
+                    )}
+                    {source && (
+                      <Card className="p-4 text-center shadow-md bg-white">
+                        <p className="text-sm text-gray-500">Source</p>
+                        <p className="text-lg font-semibold">
+                          {source === 'Cache' ? '⚡ Cache' : '💾 Database'}
+                        </p>
+                      </Card>
+                    )}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
