@@ -2,10 +2,9 @@ import { getOrAddToCache } from "@/lib/lruCache";
 import { Url } from "@/lib/models/Url";
 import { dbConnect } from "@/lib/dbConnect";
 
-export async function GET(req, contextPromise) {
+export async function GET(req, { params }) {
   try {
-    const context = await contextPromise;
-    const { shortId } = context.params;
+    const { shortId } = await params;
 
     await dbConnect();
 
@@ -29,3 +28,4 @@ export async function GET(req, contextPromise) {
     return new Response("Something went wrong!", { status: 500 });
   }
 }
+
