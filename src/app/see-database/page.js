@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 
 export default function SeeDatabase() {
@@ -31,61 +35,76 @@ export default function SeeDatabase() {
     }));
   };
 
-  const truncate = (text, length = 50) => {
-    return text.length > length ? text.slice(0, length) + '...' : text;
-  };
+  const truncate = (text, length = 60) =>
+    text.length > length ? text.slice(0, length) + '...' : text;
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-screen-xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">All Database URLs</h2>
-          {loading ? (
-            <p>Loading...</p>
-          ) : urls.length === 0 ? (
-            <p>No URLs found in the database.</p>
-          ) : (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="p-3 text-left">Short URL</th>
-                    <th className="p-3 text-left">Full URL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {urls.map((url) => (
-                    <tr key={url._id} className="border-t align-top">
-                      <td className="p-3 text-blue-600">
+      <div className="min-h-screen bg-gray-100 px-4 py-10">
+        <motion.h2
+          className="text-3xl font-bold text-center mb-10 text-gray-800"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          Stored Database URLs
+        </motion.h2>
+
+        {loading ? (
+          <div className="max-w-4xl mx-auto space-y-4">
+            {[...Array(3)].map((_, idx) => (
+              <Card key={idx}>
+                <CardContent className="space-y-2 p-4">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : urls.length === 0 ? (
+          <p className="text-center text-gray-600">No URLs found in the database.</p>
+        ) : (
+          <div className="max-w-4xl mx-auto space-y-4">
+            {urls.map((url) => {
+              const short = `${window.location.origin}/api/shorturl/${url.shortUrl}`;
+              return (
+                <motion.div
+                  key={url._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="hover:shadow-lg transition-shadow duration-200">
+                    <CardContent className="p-4 space-y-2">
+                      <div className="text-blue-600 break-words">
                         <a
-                          href={`/api/shorturl/${url.shortUrl}`}
+                          href={short}
                           target="_blank"
                           rel="noopener noreferrer"
+                          className="hover:underline"
                         >
-                          {url.shortUrl}
+                          {short}
                         </a>
-                      </td>
-                      <td className="p-3 break-words">
-                        {expandedRows[url._id]
-                          ? url.fullUrl
-                          : truncate(url.fullUrl)}
-                        {url.fullUrl.length > 50 && (
-                          <button
+                      </div>
+                      <div className="text-gray-700 break-words">
+                        {expandedRows[url._id] ? url.fullUrl : truncate(url.fullUrl)}
+                        {url.fullUrl.length > 60 && (
+                          <Button
+                            variant="link"
+                            className="ml-2 text-blue-500 p-0 h-auto"
                             onClick={() => toggleReadMore(url._id)}
-                            className="ml-2 text-sm text-blue-500 underline"
                           >
-                            {expandedRows[url._id] ? 'show less' : 'read full'}
-                          </button>
+                            {expandedRows[url._id] ? 'Show less' : 'Read full'}
+                          </Button>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );
