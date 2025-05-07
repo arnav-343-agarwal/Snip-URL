@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Navbar from '@/components/Navbar';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import Navbar from "@/components/Navbar";
+import { ExternalLink } from "lucide-react";
 
 export default function SeeDatabase() {
   const [urls, setUrls] = useState([]);
@@ -15,11 +16,11 @@ export default function SeeDatabase() {
   useEffect(() => {
     const fetchUrls = async () => {
       try {
-        const res = await fetch('/api/dburls');
+        const res = await fetch("/api/dburls");
         const data = await res.json();
         setUrls(data.urls);
       } catch (err) {
-        console.error('Error fetching database URLs:', err);
+        console.error("Error fetching database URLs:", err);
       } finally {
         setLoading(false);
       }
@@ -35,15 +36,15 @@ export default function SeeDatabase() {
     }));
   };
 
-  const truncate = (text, length = 60) =>
-    text.length > length ? text.slice(0, length) + '...' : text;
+  const truncate = (text, length = 80) =>
+    text.length > length ? text.slice(0, length) + "..." : text;
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-100 px-4 py-10">
+      <div className="min-h-screen bg-gray-50 px-4 py-10">
         <motion.h2
-          className="text-3xl font-bold text-center mb-10 text-gray-800"
+          className="text-4xl font-bold text-center mb-10 text-gray-800"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -64,40 +65,46 @@ export default function SeeDatabase() {
         ) : urls.length === 0 ? (
           <p className="text-center text-gray-600">No URLs found in the database.</p>
         ) : (
-          <div className="max-w-4xl mx-auto space-y-4">
-            {urls.map((url) => {
-              const short = `${window.location.origin}/api/shorturl/${url.shortUrl}`;
+          <div className="max-w-4xl mx-auto grid gap-6">
+            {urls.map((url, index) => {
+              const shortUrl = `${window.location.origin}/api/shorturl/${url.shortUrl}`;
+              const isExpanded = expandedRows[url._id];
+
               return (
                 <motion.div
                   key={url._id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="hover:shadow-lg transition-shadow duration-200">
-                    <CardContent className="p-4 space-y-2">
-                      <div className="text-blue-600 break-words">
+                  <Card className="border border-gray-200 shadow-md hover:shadow-lg transition duration-200 rounded-2xl">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center gap-2 text-indigo-600 text-base font-medium">
                         <a
-                          href={short}
+                          href={shortUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="hover:underline"
+                          className="hover:underline flex items-center gap-1"
                         >
-                          {short}
+                          {shortUrl}
+                          <ExternalLink size={16} />
                         </a>
-                      </div>
-                      <div className="text-gray-700 break-words">
-                        {expandedRows[url._id] ? url.fullUrl : truncate(url.fullUrl)}
-                        {url.fullUrl.length > 60 && (
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700 text-sm break-words leading-relaxed">
+                        {isExpanded ? url.fullUrl : truncate(url.fullUrl)}
+                        {url.fullUrl.length > 80 && (
                           <Button
                             variant="link"
-                            className="ml-2 text-blue-500 p-0 h-auto"
+                            size="sm"
+                            className="ml-2 text-blue-500 p-0 h-auto text-xs"
                             onClick={() => toggleReadMore(url._id)}
                           >
-                            {expandedRows[url._id] ? 'Show less' : 'Read full'}
+                            {isExpanded ? "Show less" : "Read full"}
                           </Button>
                         )}
-                      </div>
+                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>
