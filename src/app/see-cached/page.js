@@ -26,28 +26,39 @@ export default function SeeCachedUrls() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-3xl font-bold text-gray-800 mb-4"
-        >
-          Cached URLs
-        </motion.h1>
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="flex items-center justify-between flex-wrap gap-6 mb-6">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-4xl font-extrabold text-gray-800"
+          >
+            Cached URLs
+          </motion.h1>
 
-        <p className="text-gray-600 mb-6">Recently cached short URLs</p>
+          <motion.img
+            src="redish-cache.webp"
+            alt="Redis Cache"
+            className="w-20 h-20 object-contain rounded-xl shadow-md"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+          />
+        </div>
 
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md p-4">
+        <p className="text-gray-600 mb-6 text-lg">Recently cached short URLs stored in Redis</p>
+
+        <div className="overflow-x-auto bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <motion.div
                   key={i}
-                  className="h-16 bg-gray-200 rounded animate-pulse"
+                  className="h-16 bg-gray-200 rounded-xl animate-pulse"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.1 }}
@@ -80,29 +91,19 @@ export default function SeeCachedUrls() {
                       className="hover:bg-gray-50"
                     >
                       <td className="px-6 py-4 break-all">
-                        <a
-                          href={url.fullUrl}
-                          className="text-blue-500 hover:underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <span className="inline-block bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-sm font-medium">
                           {url.fullUrl}
-                        </a>
+                        </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={fullShortUrl}
-                            className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
+                        <div className="flex items-center gap-3">
+                          <span className="inline-block bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium">
                             {fullShortUrl}
-                          </a>
+                          </span>
                           <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={() => copyToClipboard(fullShortUrl)}
-                            className="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs transition"
+                            className="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs font-medium transition"
                           >
                             Copy
                           </motion.button>
