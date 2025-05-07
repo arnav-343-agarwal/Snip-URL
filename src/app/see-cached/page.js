@@ -30,27 +30,39 @@ export default function SeeCachedUrls() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between flex-wrap gap-6 mb-6">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-4xl font-extrabold text-gray-800"
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-4xl font-extrabold text-gray-800"
+            >
+              Cached URLs
+            </motion.h1>
+            <p className="text-gray-600 mt-2 text-lg">
+              Recently cached short URLs stored in Redis
+            </p>
+          </div>
+
+          {/* Redis Image Section */}
+          <motion.div
+            className="bg-white border rounded-xl shadow-lg p-4 flex items-center gap-4"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            Cached URLs
-          </motion.h1>
-
-          <motion.img
-            src="redish-cache.webp"
-            alt="Redis Cache"
-            className="w-20 h-20 object-contain rounded-xl shadow-md"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-          />
+            <img
+              src="redish-cache.webp"
+              alt="Redis Cache"
+              className="w-24 h-24 object-contain"
+            />
+            <div>
+              <p className="text-sm text-gray-500">Caching Engine</p>
+              <p className="font-semibold text-red-600">Powered by Redis</p>
+            </div>
+          </motion.div>
         </div>
-
-        <p className="text-gray-600 mb-6 text-lg">Recently cached short URLs stored in Redis</p>
 
         <div className="overflow-x-auto bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
           {loading ? (
@@ -91,15 +103,25 @@ export default function SeeCachedUrls() {
                       className="hover:bg-gray-50"
                     >
                       <td className="px-6 py-4 break-all">
-                        <span className="inline-block bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-sm font-medium">
+                        <a
+                          href={url.fullUrl}
+                          className="inline-block bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-sm font-medium hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           {url.fullUrl}
-                        </span>
+                        </a>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <span className="inline-block bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium">
+                          <a
+                            href={fullShortUrl}
+                            className="inline-block bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {fullShortUrl}
-                          </span>
+                          </a>
                           <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={() => copyToClipboard(fullShortUrl)}
