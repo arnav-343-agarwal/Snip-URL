@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   const colorMap = {
@@ -72,7 +73,8 @@ export default function Home() {
                   <p>{item.desc}</p>
                   <Link href={item.href} passHref>
                     <Button
-                      className={`mt-4 ${colorMap[item.color]} text-white`}
+                      variant="solid"
+                      className="mt-4 bg-blue-600 text-white hover:bg-blue-700 border border-transparent rounded-lg shadow-md hover:shadow-lg transition-all"
                     >
                       Explore
                     </Button>
