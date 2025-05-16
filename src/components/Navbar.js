@@ -16,7 +16,7 @@ export default function Navbar() {
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-wide text-white">
           <Link href="/" className="hover:underline">
-            QuickURL
+            ZipURL
           </Link>
         </h1>
         <div className="flex items-center space-x-4">

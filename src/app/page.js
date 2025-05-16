@@ -19,7 +19,7 @@ export default function Home() {
       <section className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 py-20 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Welcome to QuickURL
+            Welcome to ZipURL
           </h1>
           <p className="text-lg text-gray-700 mb-6">
             Your one-stop tool to shorten URLs, monitor cache, and manage links
@@ -49,7 +49,7 @@ export default function Home() {
               color: "green",
             },
             {
-              title: "See All Database URLs",
+              title: "See All URLs in Database",
               desc: "Browse all stored URLs from the MongoDB database.",
               href: "/see-database",
               color: "purple",
