@@ -67,7 +67,7 @@ export default function Generate() {
           <h1 className="text-3xl font-bold mb-2 text-gray-800">URL Shortener</h1>
           <p className="text-gray-600 text-sm">
             Paste a long URL to generate a clean, shareable short link.
-            You'll also see performance details like generation time and source (cache/database).
+            You will also see performance details like generation time and source (cache/database).
           </p>
         </motion.div>
 
